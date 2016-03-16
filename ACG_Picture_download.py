@@ -5,6 +5,8 @@ import threading
 import json
 import socket
 import time
+from  threading import Timer
+import re
 
 # #建立线程池，并启动线程直到结束
 def parallel(infos):
@@ -30,7 +32,7 @@ class MyThread(threading.Thread):
     def run(self):
         self.res=self.func(*self.args)
 
-# # #建立线程池，并启动线程直到结束
+# # #单线程测试
 # def parallel(infos):
 #     counts = range(len(infos))
 #     for i in counts:
@@ -40,16 +42,23 @@ class MyThread(threading.Thread):
 #根绝imageUrl下载图片到本地
 def downloadImage(info):
     imageUrl = info["url"]
-    imagePName = info["pname"]
+    imagePName = str(info["pname"])
     imageCName = str(info["cname"])
+
+    print(imagePName)
+
+    imagePName = re.sub("[\s+\.\!\/_,$%^*+\"\']+|[+——！，。？、~@#￥%……&*（）]+", "-",imagePName)
+
     dir = "./"+imagePName+"/"
+
     try:
         if not os.path.exists(dir):
             os.mkdir(dir)
-    except Exception as e:
+            print("创建目录成功 %s"%dir)
+    except:
         print("创建目录失败 %s"%dir)
-        print(e)
         exit()
+
     imageType = imageUrl.split('.')[-1]
     path = dir+imageCName + "."+imageType
     if os.path.exists(path):
@@ -103,4 +112,9 @@ if __name__ == "__main__":
     timeout = 10
     socket.setdefaulttimeout(timeout)
     downloadIndex()
-
+    timer_interval=240
+    t=Timer(timer_interval,downloadIndex())
+    t.start()
+    while True:
+        time.sleep(0.1)
+    print("结束")
