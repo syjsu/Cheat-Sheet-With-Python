@@ -57,7 +57,7 @@ def downloadImage(info):
             print("创建目录成功 %s"%dir)
     except:
         print("创建目录失败 %s"%dir)
-        exit()
+        pass
 
     imageType = imageUrl.split('.')[-1]
     path = dir+imageCName + "."+imageType
@@ -116,5 +116,5 @@ if __name__ == "__main__":
     t=Timer(timer_interval,downloadIndex())
     t.start()
     while True:
-        time.sleep(0.1)
+        pass
     print("结束")
