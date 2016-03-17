@@ -67,6 +67,7 @@ def downloadImage(info):
     path = dir + imageCName + "." + imageType
     if os.path.exists(path):
         print("文件已存在")
+        return
     else:
         print("文件不存在")
         try:
