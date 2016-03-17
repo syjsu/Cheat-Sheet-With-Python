@@ -8,33 +8,29 @@ import time
 from  threading import Timer
 import re
 
-
 # #建立线程池，并启动线程直到结束
 def parallel(infos):
     startTime = time.time()
-    threads = []
+    threads=[]
     counts = range(len(infos))
     for i in counts:
-        t = MyThread(downloadImage, (infos[i],), downloadImage.__name__)
+        t=MyThread(downloadImage,(infos[i],),downloadImage.__name__)
         threads.append(t)
     for i in counts:
         threads[i].start()
     for i in counts:
         threads[i].join()
-    print('花费时间:%s' % (time.time() - startTime))
-
+    print('花费时间:%s'%(time.time()-startTime))
 
 # #自定义线程类
 class MyThread(threading.Thread):
-    def __init__(self, func, args, name=''):
+    def __init__(self,func,args,name=''):
         threading.Thread.__init__(self)
-        self.name = name
-        self.func = func
-        self.args = args
-
+        self.name=name
+        self.func=func
+        self.args=args
     def run(self):
-        self.res = self.func(*self.args)
-
+        self.res=self.func(*self.args)
 
 # # #单线程测试
 # def parallel(infos):
@@ -43,7 +39,7 @@ class MyThread(threading.Thread):
 #         downloadImage(infos[i])
 #     print("OK")
 
-# 根绝imageUrl下载图片到本地
+#根绝imageUrl下载图片到本地
 def downloadImage(info):
     imageUrl = info["url"]
     imagePName = str(info["pname"])
@@ -51,20 +47,20 @@ def downloadImage(info):
 
     print(imagePName)
 
-    imagePName = re.sub("[\s+\.\!\/_,$%^*+\"\']+|[+——！，。？、~@#￥%……&*（）]+", "-", imagePName)
+    imagePName = re.sub("[\s+\.\!\/_,$%^*+\"\']+|[+——！，。？、~@#￥%……&*（）]+", "-",imagePName)
 
-    dir = "./" + imagePName + "/"
+    dir = "./"+imagePName+"/"
 
     try:
         if not os.path.exists(dir):
             os.mkdir(dir)
-            print("创建目录成功 %s" % dir)
+            print("创建目录成功 %s"%dir)
     except:
-        print("创建目录失败 %s" % dir)
+        print("创建目录失败 %s"%dir)
         return
 
     imageType = imageUrl.split('.')[-1]
-    path = dir + imageCName + "." + imageType
+    path = dir+imageCName + "."+imageType
     if os.path.exists(path):
         print("文件已存在")
         return
@@ -76,20 +72,20 @@ def downloadImage(info):
             print("下载失败")
             return
         try:
-            f = open(path, "wb")
+            f = open(path,"wb")
             f.write(data)
             f.close()
-            print("保存成功" + path)
+            print("保存成功"+path)
         except:
             print("保存失败")
             return
 
-
-# 下载整个相册
-def downloadAlbum(albumName, albumIndex):
-    reqs = []
+#下载整个相册
+def downloadAlbum(albumName,albumIndex):
+    reqs =[]
+    global downloadUrl
     try:
-        res = urllib.request.urlopen("http://acgstay.mavericks.lol:8888/index?index=" + albumIndex + "&mode=3")
+        res = urllib.request.urlopen(downloadUrl+"/index?index="+albumIndex+"&mode=3")
         resAlbum = json.loads(res.read().decode('utf-8'))
     except:
         print("获取专辑信息失败")
@@ -103,11 +99,11 @@ def downloadAlbum(albumName, albumIndex):
         reqs.append(a)
     parallel(reqs)
 
-
 # 获取专辑信息
 def downloadIndex():
+    global downloadUrl
     try:
-        res = urllib.request.urlopen("http://acgstay.mavericks.lol:8888/index?index=mainindex&mode=3")
+        res = urllib.request.urlopen(downloadUrl+"/index?index=mainindex&mode=3")
         resAlbum = json.loads(res.read().decode('utf-8'))
         print(resAlbum)
     except:
@@ -125,15 +121,16 @@ def downloadIndex():
         downloadAlbum(Album['des'], Album['index'])
     print("结束任务")
 
+downloadUrl = "http://acgstay.mavericks.lol:8888"
 
 if __name__ == "__main__":
 
     timeout = 10
     socket.setdefaulttimeout(timeout)
     downloadIndex()
-    timer_interval = 240
-    t = Timer(timer_interval, downloadIndex())
+    timer_interval=240
+    t=Timer(timer_interval,downloadIndex())
     t.start()
     while True:
-        time.sleep(0.1)
+        pass
     print("结束")
