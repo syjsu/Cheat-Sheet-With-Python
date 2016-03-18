@@ -5,8 +5,10 @@ import threading
 import json
 import socket
 import time
-from  threading import Timer
 import re
+from  threading import Timer
+import enum
+import tkinter as tk
 
 # #建立线程池，并启动线程直到结束
 def parallel(infos):
@@ -49,7 +51,9 @@ def downloadImage(info):
 
     imagePName = re.sub("[\s+\.\!\/_,$%^*+\"\']+|[+——！，。？、~@#￥%……&*（）]+", "-",imagePName)
 
-    dir = "./"+imagePName+"/"
+    global downloadFile
+
+    dir = "./"+downloadFile+"/"+imagePName+"/"
 
     try:
         if not os.path.exists(dir):
@@ -121,13 +125,25 @@ def downloadIndex():
         downloadAlbum(Album['des'], Album['index'])
     print("结束任务")
 
-downloadUrl = "http://acgstay.mavericks.lol:8888"
+# #下载地址
+# downloadUrl = "http://acgstay.mavericks.lol:8888"
+# #下载文件夹
+# downloadFile= "ACG"
 
+#下载地址
+downloadUrl = "http://cosplay.mavericks.lol:8887"
+#下载文件夹
+downloadFile= "COS"
+
+# 主程序
 if __name__ == "__main__":
+
+    fileFolder="./"+downloadFile+"/"
+    if not os.path.exists(fileFolder):
+        os.mkdir(fileFolder)
 
     timeout = 10
     socket.setdefaulttimeout(timeout)
-    downloadIndex()
     timer_interval=240
     t=Timer(timer_interval,downloadIndex())
     t.start()
