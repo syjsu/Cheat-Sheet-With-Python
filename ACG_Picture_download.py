@@ -11,7 +11,7 @@ import enum
 import tkinter as tk
 
 # #建立线程池，并启动线程直到结束
-def parallel(infos):
+def parallel(infos,downloadFile):
     startTime = time.time()
     threads=[]
     counts = range(len(infos))
@@ -69,7 +69,7 @@ def downloadImage(info,downloadFile):
     else:
         print("文件不存在")
         try:
-            data = urllib.request.urlopen(imageUrl).read()
+            data = urllib.request.urlopen(urllib.request.Request(imageUrl)).read()
         except Exception as e:
             print("下载失败",e)
             return
@@ -83,10 +83,10 @@ def downloadImage(info,downloadFile):
             return
 
 #下载整个相册
-def downloadAlbum(albumName,albumIndex,downloadUrl):
+def downloadAlbum(albumName,albumIndex,downloadUrl,downloadFile):
     reqs =[]
     try:
-        res = urllib.request.urlopen(downloadUrl+"/index?index="+albumIndex+"&mode=3")
+        res = urllib.request.urlopen(urllib.request.Request(downloadUrl+"/index?index="+albumIndex+"&mode=3"))
         resAlbum = json.loads(res.read().decode('utf-8'))
     except:
         print("获取专辑信息失败")
@@ -98,7 +98,7 @@ def downloadAlbum(albumName,albumIndex,downloadUrl):
         a['cname'] = Album['id']
         a['url'] = Album['url']
         reqs.append(a)
-    parallel(reqs)
+    parallel(reqs,downloadFile)
 
 # 获取专辑信息
 def downloadIndex(downloadUrl,downloadFile):
@@ -109,11 +109,8 @@ def downloadIndex(downloadUrl,downloadFile):
     socket.setdefaulttimeout(timeout)
 
     try:
-
         print(downloadUrl+"/index?index=mainindex&mode=3")
-
-        res = urllib.request.Request()
-        res = urllib.request.urlopen(downloadUrl+"/index?index=mainindex&mode=3")
+        res = urllib.request.urlopen(urllib.request.Request(downloadUrl+"/index?index=mainindex&mode=3"))
         resAlbum = json.loads(res.read().decode('utf-8'))
         print(resAlbum)
     except Exception as e:
@@ -128,9 +125,18 @@ def downloadIndex(downloadUrl,downloadFile):
         pic['url'] = Album['url']
         downloadImage(pic,downloadFile)
         # 下载专辑
-        downloadAlbum(Album['des'], Album['index'],downloadUrl)
+        downloadAlbum(Album['des'], Album['index'],downloadUrl,downloadFile)
     print("结束任务")
 
+#下载地址
+downloadUrlACG = "http://acgstay.mavericks.lol:8888"
+#下载文件夹
+downloadFileACG= "ACG"
+
+#下载地址
+downloadUrlCOS = "http://cosplay.mavericks.lol:8887"
+#下载文件夹
+downloadFileCOS = "COS"
 
 
 # 主程序
